@@ -1,0 +1,52 @@
+name: portable-release-actions-workflow
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'c*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+permissions:
+    contents: write
+    
+jobs:
+  build:
+    name: Create Release
+    runs-on: windows-latest
+    env:
+      targetZip: esp-idf-tools-portable-${{ github.ref_name }}.zip
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: installer
+        shell: cmd
+        run: |
+          curl https://dl.espressif.com/dl/esp-idf-tools-setup-1.2.exe -L -J --output installer.exe &&^
+          dir
+          
+      - name: installer
+        shell: cmd
+        run: |
+          curl https://github.com/Bioruebe/UniExtract2/releases/download/v2.0.0-rc.3/UniExtractRC3.zip -L -J -O &&^
+          7z x UniExtractRC3.zip -o"UniExtractRC3" &&^
+          dir
+          
+      - name: WIX uncompress
+        shell: cmd
+        run: |
+          .\UniExtractRC3\UniExtract\bin\innounp.exe -b installer.exe -x -d"installation" &&^
+          dir
+          
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          directory: "installation/{app}"
+          filename: "${{ env.targetZip }}"
+          
+      - name: Release prebuilt
+        uses: ncipollo/release-action@v1.18.0
+        with:
+          artifacts: "installation/{app}/${{ env.targetZip }}"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
