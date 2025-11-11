@@ -4,4 +4,5 @@ esp-idf-tools-portable
 - https://github.com/espressif/ESP8266_RTOS_SDK/blob/d412ac601befc4dd024d2d2adcfaa319c7463e36/tools/windows/tool_setup/idf_cmd_init.bat
 - https://github.com/espressif/ESP8266_RTOS_SDK/blob/d412ac601befc4dd024d2d2adcfaa319c7463e36/tools/windows/tool_setup/idf_tool_setup.iss
 - https://github.com/espressif/ESP8266_RTOS_SDK/blob/d412ac601befc4dd024d2d2adcfaa319c7463e36/tools/windows/tool_setup/idf_setup.iss.inc
+- [espressif/idf-env: idf-env tool helps set up and manage ESP-IDF installations](https://github.com/espressif/idf-env)
 
