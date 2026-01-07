@@ -1,52 +1,46 @@
 name: portable-release-actions-workflow
-on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-      - 'c*' # Push events to matching v*, i.e. v1.0, v20.15.10
-
+on: workflow_dispatch
+  
 permissions:
-    contents: write
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
     
 jobs:
   build:
     name: Create Release
     runs-on: windows-latest
+    strategy:
+      matrix:
+        esp-idf-version: [ "v5.5.1", "v5.5", "v5.4", "v5.3" ] # , "v4.4.7" , "v4.2.4" , "v3.3.6" ]
     env:
       targetZip: esp-idf-tools-portable-${{ github.ref_name }}.zip
     steps:
       - uses: actions/checkout@v5
       
-      - name: installer
-        shell: cmd
+      - shell: cmd
         run: |
-          curl https://dl.espressif.com/dl/esp-idf-tools-setup-1.2.exe -L -J --output installer.exe &&^
-          dir
-          
-      - name: installer
-        shell: cmd
+          .\setup.cmd ${{ matrix.esp-idf-version }}
+
+      - shell: cmd
         run: |
-          curl https://github.com/Bioruebe/UniExtract2/releases/download/v2.0.0-rc.3/UniExtractRC3.zip -L -J -O &&^
-          7z x UniExtractRC3.zip -o"UniExtractRC3" &&^
-          dir
+          cd /d "%USERPROFILE%\Downloads\esp-idf-tools-portable" &&^
+          dir /S
           
-      - name: WIX uncompress
-        shell: cmd
-        run: |
-          .\UniExtractRC3\UniExtract\bin\innounp.exe -b installer.exe -x -d"installation" &&^
-          dir
-          
+        
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          directory: "installation/{app}"
-          filename: "${{ env.targetZip }}"
+          directory: '$USERPROFILE/Downloads/esp-idf-tools-portable'
+          filename: "${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
           
       - name: Release prebuilt
-        uses: ncipollo/release-action@v1.18.0
+        uses: ncipollo/release-action@v1
         with:
-          artifacts: "installation/{app}/${{ env.targetZip }}"
+          tag: ${{ matrix.esp-idf-version }}
+          artifacts: "$USERPROFILE/Downloads/esp-idf-tools-portable/${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
