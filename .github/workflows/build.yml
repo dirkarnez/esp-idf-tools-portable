@@ -27,20 +27,13 @@ jobs:
       - shell: cmd
         run: |
           cd /d "%USERPROFILE%\Downloads\esp-idf-tools-portable" &&^
-          dir /S
-          
-        
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          directory: '$USERPROFILE/Downloads/esp-idf-tools-portable'
-          filename: "${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
+          dir /S &&^
+          7z a -tzip "${{ github.repository }}\${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
           
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ matrix.esp-idf-version }}
-          artifacts: "$USERPROFILE/Downloads/esp-idf-tools-portable/${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
+          artifacts: "${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
