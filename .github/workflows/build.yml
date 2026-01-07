@@ -28,7 +28,7 @@ jobs:
         run: |
           cd /d "%USERPROFILE%\Downloads\esp-idf-tools-portable" &&^
           dir /S &&^
-          7z a -tzip "${{ github.repository }}\${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
+          7z a -tzip "${{ github.workspace }}\${{ github.event.repository.name }}-${{ matrix.esp-idf-version }}.zip"
 
       - shell: cmd
         run: |
