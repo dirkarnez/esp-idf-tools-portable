@@ -1,4 +1,5 @@
 name: portable-release-actions-workflow
+
 on: workflow_dispatch
   
 permissions:
@@ -23,7 +24,12 @@ jobs:
       - shell: cmd
         run: |
           .\setup.cmd ${{ matrix.esp-idf-version }}
-
+          
+      - shell: cmd
+        run: |
+          cd /d "%USERPROFILE%\Downloads\esp-idf-tools-portable\esp-idf" &&^
+          rmdir /s /q .git
+          
       - shell: cmd
         run: |
           cd /d "%USERPROFILE%\Downloads\esp-idf-tools-portable" &&^
